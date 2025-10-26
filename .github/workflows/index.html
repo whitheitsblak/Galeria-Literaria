@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Galería Literaria - Detectives Literarios</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: "Inter", sans-serif;
+    background: linear-gradient(135deg, #f0f4f0 0%, #e8f5e9 50%, #c8e6c9 100%);
+    color: #1b5e20;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  #particlesCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  .title-3d-container {
+    text-align: center;
+    margin: 60px 0 80px;
+  }
+
+  .title-3d {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-weight: 900;
+    letter-spacing: 8px;
+    display: inline-block;
+  }
+
+  .title-3d span {
+    display: inline-block;
+    color: #1b5e20;
+    text-shadow: 
+      0 2px 0 #2e7d32, 0 4px 0 #388e3c,
+      0 6px 0 #43a047, 0 8px 0 #4caf50,
+      0 10px 10px rgba(27, 94, 32, 0.3);
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    color: #2e7d32;
+    margin-top: -40px;
+    margin-bottom: 60px;
+    font-weight: 600;
+  }
+
+  .video-section {
+    margin-bottom: 80px;
+  }
+
+  .video-container {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(27, 94, 32, 0.15);
+    border: 2px solid rgba(76, 175, 80, 0.3);
+    transition: box-shadow 0.3s, border-color 0.3s;
+  }
+
+  .video-container:hover {
+    border-color: rgba(76, 175, 80, 0.6);
+    box-shadow: 0 25px 70px rgba(27, 94, 32, 0.2);
+  }
+
+  .video-title {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: #2e7d32;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(27, 94, 32, 0.2);
+  }
+
+  .video-wrapper iframe,
+  .video-wrapper video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Secciones de galería */
+  .gallery-section {
+    margin: 80px 0;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: #1b5e20;
+    text-align: center;
+    margin-bottom: 50px;
+    font-weight: 700;
+    text-shadow: 
+      0 1px 0 #2e7d32, 0 2px 0 #388e3c,
+      0 3px 0 #43a047, 0 4px 0 #4caf50,
+      0 5px 5px rgba(27, 94, 32, 0.3),
+      0 10px 10px rgba(27, 94, 32, 0.2);
+    position: relative;
+    padding-bottom: 20px;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #4caf50, transparent);
+    border-radius: 2px;
+  }
+
+  /* Subsecciones para grados */
+  .subsection {
+    margin: 50px 0;
+  }
+
+  .subsection-title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: #1b5e20;
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 15px 30px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 5px 20px rgba(76, 175, 80, 0.2);
+    text-shadow: 
+      0 1px 0 #2e7d32, 0 2px 0 #388e3c,
+      0 3px 0 #4caf50, 0 4px 4px rgba(27, 94, 32, 0.3);
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+  }
+
+  .gallery-item {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 2px solid rgba(76, 175, 80, 0.2);
+    box-shadow: 0 10px 30px rgba(27, 94, 32, 0.15);
+    position: relative;
+  }
+
+  .gallery-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(27, 94, 32, 0.25);
+    border-color: rgba(76, 175, 80, 0.6);
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.05);
+  }
+
+  .gallery-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(27, 94, 32, 0.95), transparent);
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform 0.3s;
+  }
+
+  .gallery-item:hover .gallery-overlay {
+    transform: translateY(0);
+  }
+
+  .gallery-overlay h3 {
+    font-size: 1.2rem;
+    color: #a5d6a7;
+    margin-bottom: 8px;
+  }
+
+  .gallery-overlay p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(27, 94, 32, 0.95);
+  }
+
+  .modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(165, 214, 167, 0.5);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    font-size: 50px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 1001;
+  }
+
+  .modal-close:hover {
+    color: #a5d6a7;
+    transform: rotate(90deg);
+  }
+
+  .back-button {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+    transition: all 0.3s;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .back-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(76, 175, 80, 0.6);
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 20px 15px;
+    }
+
+    .title-3d-container {
+      margin: 40px 0 50px;
+    }
+
+    .title-3d {
+      font-size: 2rem;
+      letter-spacing: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      margin-top: -20px;
+      margin-bottom: 40px;
+    }
+
+    .video-section {
+      margin-bottom: 50px;
+    }
+
+    .video-container {
+      padding: 20px;
+    }
+
+    .video-title {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
+
+    .gallery-section {
+      margin: 50px 0;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 30px;
+    }
+
+    .subsection {
+      margin: 30px 0;
+    }
+
+    .subsection-title {
+      font-size: 1.2rem;
+      padding: 10px 20px;
+    }
+
+    .gallery-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .gallery-item {
+      border-radius: 15px;
+    }
+
+    .gallery-item img {
+      height: 250px;
+    }
+
+    .gallery-overlay {
+      padding: 15px;
+    }
+
+    .gallery-overlay h3 {
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+
+    .gallery-overlay p {
+      font-size: 0.8rem;
+    }
+
+    .back-button {
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      font-size: 0.9rem;
+    }
+
+    .modal-close {
+      top: 20px;
+      right: 20px;
+      font-size: 40px;
+    }
+
+    .modal-content {
+      max-width: 95%;
+      max-height: 85%;
+    }
+  }
+
+  .fade-in {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+</head>
+<body>
+<canvas id="particlesCanvas"></canvas>
+
+<div class="container">
+  <div class="title-3d-container fade-in">
+    <h1 class="title-3d">
+      <span>GALERÍA</span>
+      <br>
+      <span>LITERARIA</span>
+    </h1>
+  </div>
+
+  <p class="subtitle fade-in" style="animation-delay: 0.2s">
+    ✨ Momentos mágicos capturados en imágenes ✨
+  </p>
+
+  <div class="video-section fade-in" style="animation-delay: 0.3s">
+    <div class="video-container">
+      <h2 class="video-title">📚 PARTICIPACIÓN FERIA DEL LIBRO 2025</h2>
+      <div class="video-wrapper">
+        <iframe src="https://www.youtube.com/embed/VRLdK005DHM" 
+                allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: GRADOS DÉCIMOS -->
+  <div class="gallery-section fade-in" style="animation-delay: 0.4s">
+    <h2 class="section-title">📚 GRADOS DÉCIMOS</h2>
+
+    <!-- 10-1 -->
+    <div class="subsection">
+      <h3 class="subsection-title">10-1</h3>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="https://i.ibb.co/3DCHTN6/Whats-App-Image-2025-10-22-at-8-46-56-AM.jpg" alt="10-1 Actividades" loading="lazy">
+          <div class="gallery-overlay">
+            <h3>📖 Grado 10-1</h3>
+            <p>Actividades literarias del curso</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10-2 -->
+    <div class="subsection">
+      <h3 class="subsection-title">10-2</h3>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="https://i.ibb.co/hxhwQsFx/Whats-App-Image-2025-10-22-at-8-46-56-AM-1.jpg" alt="10-2 Actividades" loading="lazy">
+          <div class="gallery-overlay">
+            <h3>📖 Grado 10-2</h3>
+            <p>Actividades literarias del curso</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10-3 -->
+    <div class="subsection">
+      <h3 class="subsection-title">10-3</h3>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="https://i.ibb.co/Q72hjQkR/Whats-App-Image-2025-10-22-at-8-46-57-AM-4.jpg" alt="10-3 Actividades" loading="lazy">
+          <div class="gallery-overlay">
+            <h3>📖 Grado 10-3</h3>
+            <p>Actividades literarias del curso</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10-4 -->
+    <div class="subsection">
+      <h3 class="subsection-title">10-4</h3>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="https://i.ibb.co/PZxgR5JR/Whats-App-Image-2025-10-22-at-8-46-57-AM-1.jpg" alt="10-4 Actividades" loading="lazy">
+          <div class="gallery-overlay">
+            <h3>📖 Grado 10-4</h3>
+            <p>Actividades literarias del curso</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10-5 -->
+    <div class="subsection">
+      <h3 class="subsection-title">10-5</h3>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="https://i.ibb.co/60H7ybfB/Whats-App-Image-2025-10-22-at-8-46-57-AM-2.jpg" alt="10-5 Actividades" loading="lazy">
+          <div class="gallery-overlay">
+            <h3>📖 Grado 10-5</h3>
+            <p>Actividades literarias del curso</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: DETECTIVES LITERARIOS -->
+  <div class="gallery-section fade-in" style="animation-delay: 0.5s">
+    <h2 class="section-title">🔍 DETECTIVES LITERARIOS</h2>
+    <div class="gallery-grid">
+      <div class="gallery-item">
+        <img src="https://i.ibb.co/CKpyM0vN/Whats-App-Image-2025-10-24-at-2-06-28-PM.jpg" alt="Detectives 1" loading="lazy">
+        <div class="gallery-overlay">
+          <h3>🔎 Investigación Literaria</h3>
+          <p>Estudiantes en acción</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://i.ibb.co/Jws3fWzQ/Whats-App-Image-2025-10-22-at-8-46-57-AM-3.jpg" alt="Detectives 2" loading="lazy">
+        <div class="gallery-overlay">
+          <h3>📚 Club de Lectura</h3>
+          <p>Análisis de textos</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://i.ibb.co/bg0cCmkg/Whats-App-Image-2025-10-24-at-2-06-14-PM.jpg" alt="Detectives 3" loading="lazy">
+        <div class="gallery-overlay">
+          <h3>✍️ Talleres Creativos</h3>
+          <p>Escritura y creatividad</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: DÍA DEL IDIOMA -->
+  <div class="gallery-section fade-in" style="animation-delay: 0.6s">
+    <h2 class="section-title">🎭 DÍA DEL IDIOMA</h2>
+    <div class="gallery-grid">
+      <div class="gallery-item">
+        <img src="https://i.ibb.co/JjFhBnR9/Whats-App-Image-2025-10-24-at-2-06-47-PM.jpg" alt="Día del Idioma" loading="lazy">
+        <div class="gallery-overlay">
+          <h3>🎪 Celebración del Idioma</h3>
+          <p>Actividades y presentaciones</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: PARTICIPACIÓN FERIA DEL LIBRO 2025 -->
+  <div class="gallery-section fade-in" style="animation-delay: 0.7s">
+    <h2 class="section-title">📚 PARTICIPACIÓN FERIA DEL LIBRO 2025</h2>
+    <div class="gallery-grid">
+      <div class="gallery-item">
+        <img src="https://i.ibb.co/KzsbGZ3X/Whats-App-Image-2025-10-22-at-8-50-46-AM-1.jpg" alt="Feria 1" loading="lazy">
+        <div class="gallery-overlay">
+          <h3>🎉 Stand Institucional</h3>
+          <p>Nuestra participación en la feria</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://i.ibb.co/Q3KffVDG/Whats-App-Image-2025-10-22-at-8-50-45-AM.jpg" alt="Feria 2" loading="lazy">
+        <div class="gallery-overlay">
+          <h3>📚 Exposición de Trabajos</h3>
+          <p>Proyectos estudiantiles</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://i.ibb.co/vx5p0vcX/Whats-App-Image-2025-10-22-at-8-46-58-AM-1.jpg" alt="Feria 3" loading="lazy">
+        <div class="gallery-overlay">
+          <h3>🏆 Reconocimientos</h3>
+          <p>Premiación y logros</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://i.ibb.co/BVGHyFYr/Whats-App-Image-2025-10-22-at-8-50-46-AM.jpg" alt="Feria 4" loading="lazy">
+        <div class="gallery-overlay">
+          <h3>✨ Momentos Especiales</h3>
+          <p>Experiencias memorables</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="imageModal">
+  <span class="modal-close" onclick="closeModal()">&times;</span>
+  <img class="modal-content" id="modalImage" alt="Imagen ampliada">
+</div>
+
+<button class="back-button" onclick="window.location.href='https://whitheitsblak.github.io/Detectives-Y-Reveldes-Literarios/'">
+  <span>←</span> Volver al Inicio
+</button>
+
+<script>
+  const canvas = document.getElementById('particlesCanvas');
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+  const particles = [];
+  const particleCount = 40;
+
+  const greenShades = [
+    'rgba(76, 175, 80, 0.5)',
+    'rgba(102, 187, 106, 0.4)',
+    'rgba(129, 199, 132, 0.5)',
+    'rgba(165, 214, 167, 0.4)'
+  ];
+
+  class Particle {
+    constructor() {
+      this.reset();
+      this.y = Math.random() * height;
+      this.color = greenShades[Math.floor(Math.random() * greenShades.length)];
+    }
+
+    reset() {
+      this.x = Math.random() * width;
+      this.y = height + 10;
+      this.vx = (Math.random() - 0.5) * 0.5;
+      this.vy = -(Math.random() * 1 + 0.5);
+      this.size = Math.random() * 3 + 2;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if (this.y < -10 || this.x < -10 || this.x > width + 10) {
+        this.reset();
+      }
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push(new Particle());
+  }
+
+  let lastTime = 0;
+  const fps = 30;
+  const interval = 1000 / fps;
+
+  function animate(currentTime) {
+    requestAnimationFrame(animate);
+    
+    const deltaTime = currentTime - lastTime;
+    if (deltaTime < interval) return;
+    
+    lastTime = currentTime - (deltaTime % interval);
+    
+    ctx.clearRect(0, 0, width, height);
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+  }
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  animate(0);
+
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImage');
+  const galleryItems = document.querySelectorAll('.gallery-item img');
+
+  galleryItems.forEach(img => {
+    img.onclick = function() {
+      modal.classList.add('active');
+      modalImg.src = this.src;
+      modalImg.alt = this.alt;
+    }
+  });
+
+  function closeModal() {
+    modal.classList.remove('active');
+  }
+
+  modal.onclick = function(e) {
+    if (e.target === modal || e.target === modalImg) {
+      closeModal();
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+</body>
+</html>
